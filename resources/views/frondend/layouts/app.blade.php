@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/png" href="assets/images/k_favicon_32x.png">
+    <link rel="shortcut icon" type="image/png" href="{{$site_setting->getFirstMediaUrl('site_logo','small')}}">
     <title>Moda Terapim | En ucuz En Moda E-Ticaret Platformu </title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -60,13 +60,18 @@
     <div id="nt_content">
 
        @if(Request::is('/') ||Request::is('checkout')|| Request::is('iletisim'))
-           @include('frondend.layouts.rootCategories')
+           @if(isset($descants))
+               @include('frondend.layouts.descands')
+           @else
+               @include('frondend.layouts.rootCategories')
+
+           @endif
        @endif
 
         <!--shop banner-->
         <div class="kalles-section page_section_heading">
             <div class="page-head tc pr oh cat_bg_img page_head_">
-                <div class="parallax-inner nt_parallax_false lazyload nt_bg_lz pa t__0 l__0 r__0 b__0" data-bgset="{{asset('images/shop-banner.jpg')}}"></div>
+                <div class="parallax-inner nt_parallax_false lazyload nt_bg_lz pa t__0 l__0 r__0 b__0" data-bgset="{{asset('images/welcomeBanner.jpg')}}"></div>
                 <div class="container pr z_100">
                     <h1 class="mb__5 cw">@yield('banner_title','Hosgeldiniz')</h1>
                     <p class="mg__0">@yield('banner_text','İstediğiniz Ürünü sadece 2 tıkla sepetinize ekleyebilir ,Aradıgınız Ürünü "Filtrele"  me bölümünden bulabilirsiniz') </p>

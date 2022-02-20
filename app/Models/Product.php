@@ -13,7 +13,7 @@ class Product extends Model implements HasMedia
 {
     use HasFactory,InteractsWithMedia;
 
-    protected $fillable=["shop_id","name","price","quantity","is_published","barcode"];
+    protected $fillable=["isSlider","isSpecial","shop_id","name","price","quantity","is_published","barcode","category_id"];
     protected $appends=["variant_id"];
 
     public function categories (){

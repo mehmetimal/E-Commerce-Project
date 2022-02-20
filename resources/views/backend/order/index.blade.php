@@ -24,6 +24,7 @@
                     <th>Ücret</th>
                     <th>Tip</th>
                     <th>Durum</th>
+                    <th>Sipariş Tarihi</th>
                     <th style="width: 22%">İşlem</th>
                 </tr>
                 </thead>
@@ -36,7 +37,7 @@
                         <td>{{$order->price }} ₺</td>
                         <td>{{$order->order_type == 1 ? 'KAPIDA ÖDEME ' :'KREDİ KARTI '}}</td>
                         <td>{{$order->state}}</td>
-
+                        <td>{{$order->created_at->format('Y-m-d')}}</td>
                         <td>
                             @can('Update Order')
                             <a href="{{route('order.edit',$order->id)}}" title="Güncelle" type="button" class="btn btn-success"><i class="fas fa-edit"></i></a>
@@ -59,7 +60,7 @@
                     <th>Ücret</th>
                     <th>Tip</th>
                     <th>Durum</th>
-
+                    <th>Sipariş Tarihi</th>
                     <th style="width: 22%">İşlem</th>
                 </tr>
                 </tfoot>

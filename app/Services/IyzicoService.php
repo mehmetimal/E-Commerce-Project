@@ -5,8 +5,11 @@ namespace App\Services;
 
 
 use App\Models\Shop;
-use Illuminate\Http\Request;
+use App\Models\Variant;
+
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Iyzipay\Model\BasketItem;
 
 
@@ -91,115 +94,216 @@ public  function initializeBillingAddress(){
 }
 public  function initializeBasketItems(){
     $piece = 0;
+
     foreach (\Cart::content() as $item) {
+        $variant = Variant::with('product.shop.detail')->where('barcode',$item->id)->first();
 
+        $price=$item->price *$item->qty;
+        $paidPrice =$price - ((double)($price/100)*($variant->product->shop->detail->commission_rate));
         $BasketItem = new BasketItem();
-
         $BasketItem->setId($item->id);
         $BasketItem->setName($item->name);
-        $BasketItem->setCategory1("ÜRÜN");
+        $BasketItem->setCategory1("Product");
+        $BasketItem->setSubMerchantKey($variant->product->shop->detail->shop_key);
+        $BasketItem->setSubMerchantPrice($paidPrice);
         $BasketItem->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
-        $BasketItem->setPrice($item->price * $item->qty);
+        $BasketItem->setPrice($price);
         $basketItems[$piece] = $BasketItem;
-
         $piece++;
     }
     return $basketItems;
 }
-public function  createPersonalShop(Request $formRequest,$shop_id){
+public function  createPersonalShop($user_id,$nick_name,$name,$image,$address,$Iban,$IdentityNumber,$rate){
+    DB::beginTransaction();
+    try {
+        $shop = Shop::create([
+            'user_id' => $user_id,
+            'nick_name' => $nick_name,
+            'name' => $name,
+        ]);
 
-    $options = $this->initializeOptions();
+
+        $shop->addMedia($image)->toMediaCollection('shop_logos');
+
+        $shop = Shop::where('id',$shop->id) ->with('user','user.detail')->first();
+
+        $options = $this->initializeOptions();
+        $request = new \Iyzipay\Request\CreateSubMerchantRequest();
+        $request->setLocale(\Iyzipay\Model\Locale::TR);
+        $request->setConversationId("123456789");
+        $request->setSubMerchantExternalId($shop->id);
+        $request->setSubMerchantType(\Iyzipay\Model\SubMerchantType::PERSONAL);
+        $request->setAddress($address);
+        $request->setContactName($shop->user->detail->name);
+        $request->setContactSurname($shop->user->detail->surname);
+        $request->setEmail($shop->user->email);
+        $request->setGsmNumber($shop->user->detail->phone);
+        $request->setName($name);
+        $request->setIban($Iban);
+        $request->setIdentityNumber($IdentityNumber);
+        $request->setCurrency(\Iyzipay\Model\Currency::TL);
+        # make request
+        $subMerchant = \Iyzipay\Model\SubMerchant::create($request, $options);
+
+        if ($subMerchant->getStatus() =='success'){
+            $key = $subMerchant->getSubMerchantKey();
+
+            $shop->detail()->create([
+                'address'=>$address,
+                'Iban'=>$Iban,
+                'IdentityNumber'=>$IdentityNumber,
+                'shop_type'=>1,
+                'shop_key'=>$key,
+                'commission_rate'=>$rate
+            ]);
+        DB::commit();
+        return true ;
+        }
 
 
-    $shop = Shop::where('id',$shop_id)->first();
 
-    $shop->detail()->create([
-        'address'=>$formRequest->address,
-        'Iban'=>$formRequest->Iban,
-        'IdentityNumber'=>$formRequest->IdentityNumber,
-        'shop_type'=>1
-    ]);
+    }catch (\Exception $exception){
 
-    $shop = Shop::where('id',$shop_id) ->with('user','detail')->first();
+        Log::critical($exception->getMessage()); ;
+        DB::rollback();
+    }
 
-    $request = new \Iyzipay\Request\CreateSubMerchantRequest();
-    $request->setLocale(\Iyzipay\Model\Locale::TR);
-    $request->setConversationId("123456789");
-    $request->setSubMerchantExternalId($shop->id);
-    $request->setSubMerchantType(\Iyzipay\Model\SubMerchantType::PERSONAL);
-    $request->setAddress($shop->detail->address);
-    $request->setContactName('Mehmet');
-    $request->setContactSurname('İMAL');
-    $request->setEmail($shop->user->email);
-    $request->setGsmNumber('05453747823');
-    $request->setName($shop->name);
-    $request->setIban($shop->Iban);
-    $request->setIdentityNumber($shop->detail->IdentityNumber);
-    $request->setCurrency(\Iyzipay\Model\Currency::TL);
-
-    # make request
-    $subMerchant = \Iyzipay\Model\SubMerchant::create($request, $options);
-    dd($subMerchant);
-    # print result
-   return $subMerchant;
-}
-public function createPrivateShop($shop_id){
-    $options = $this->initializeOptions();
-
-    $shop = Shop::where('id',$shop_id)->first();
-
-    $request = new \Iyzipay\Request\CreateSubMerchantRequest();
-    $request->setLocale(\Iyzipay\Model\Locale::TR);
-    $request->setConversationId("123456789");
-    $request->setSubMerchantExternalId($shop->id);
-    $request->setSubMerchantType(\Iyzipay\Model\SubMerchantType::PRIVATE_COMPANY);
-    $request->setAddress($shop->address);
-    $request->setTaxOffice($shop->taxOffice);
-    $request->setLegalCompanyTitle($shop->legalCompanyName);
-    $request->setEmail($shop->email);
-    $request->setGsmNumber($shop->phone);
-    $request->setName($shop->name);
-    $request->setIban($shop->Iban);
-    $request->setIdentityNumber($shop->IdentityNumber);
-    $request->setCurrency(\Iyzipay\Model\Currency::TL);
-
-    # make request
-    $subMerchant = \Iyzipay\Model\SubMerchant::create($request, $options);
-
-    # print result
-    return $subMerchant;
 }
 
+public function createPrivateShop($user_id, $nick_name, $name, $image, $address, $Iban, $IdentityNumber, $rate, $taxOffice, $legalCompanyName){
 
-public function createLimitedShop($shop_id){
-    $options = $this->initializeOptions();
-    $shop = Shop::where('id',$shop_id)->first();
+    DB::beginTransaction();
+    try {
+        $shop = Shop::create([
+            'user_id' => $user_id,
+            'nick_name' => $nick_name,
+            'name' => $name,
+        ]);
 
-    # create request class
-    $request = new \Iyzipay\Request\CreateSubMerchantRequest();
-    $request->setLocale(\Iyzipay\Model\Locale::TR);
-    $request->setConversationId("123456789");
-    $request->setSubMerchantExternalId($shop->id);
-    $request->setSubMerchantType(\Iyzipay\Model\SubMerchantType::LIMITED_OR_JOINT_STOCK_COMPANY);
-    $request->setAddress($shop->address);
-    $request->setTaxOffice($shop->taxOffice);
-    $request->setTaxNumber($shop->taxNumber);
-    $request->setLegalCompanyTitle($shop->legalCompanyName);
-    $request->setEmail($shop->email);
-    $request->setGsmNumber($shop->phone);
-    $request->setName($shop->name);
-    $request->setIban($shop->Iban);
-    $request->setCurrency(\Iyzipay\Model\Currency::TL);
+        $shop->addMedia($image)->toMediaCollection('shop_logos');
 
-    # make request
-    $subMerchant = \Iyzipay\Model\SubMerchant::create($request, $options);
+        $shop = Shop::where('id', $shop->id)->with('user', 'user.detail')->first();
 
-    # print result
-   return $subMerchant;
+        $options = $this->initializeOptions();
+        $request = new \Iyzipay\Request\CreateSubMerchantRequest();
+        $request->setLocale(\Iyzipay\Model\Locale::TR);
+        $request->setConversationId("123456789");
+        $request->setSubMerchantExternalId($shop->id);
+        $request->setSubMerchantType(\Iyzipay\Model\SubMerchantType::PRIVATE_COMPANY);
+        $request->setAddress($address);
+        $request->setTaxOffice($taxOffice);
+        $request->setLegalCompanyTitle($legalCompanyName);
+        $request->setEmail($shop->user->email);
+        $request->setGsmNumber($shop->user->detail->phone);
+        $request->setName($name);
+        $request->setIban($Iban);
+        $request->setIdentityNumber($IdentityNumber);
+        $request->setCurrency(\Iyzipay\Model\Currency::TL);
+
+        # make request
+        $subMerchant = \Iyzipay\Model\SubMerchant::create($request, $options);
+
+
+        if ($subMerchant->getStatus() =='success'){
+
+            $key = $subMerchant->getSubMerchantKey();
+
+            $shop->detail()->create([
+                'address'=>$address,
+                'Iban'=>$Iban,
+                'IdentityNumber'=>$IdentityNumber,
+                'shop_type'=>2,
+                'shop_key'=>$key,
+                'commission_rate'=>$rate,
+                'tax_office'=>$taxOffice,
+                'legal_company_title'=>$legalCompanyName
+            ]);
+
+            DB::commit();
+
+            return true ;
+        }
+    }catch (\Exception $exception){
+
+        DB::rollBack();
+    }
 }
 
+public function createLimitedShop($user_id, $nick_name, $name, $image, $address, $Iban, $rate,$legalCompanyName,$taxNumber, $taxOffice ){
+
+        DB::beginTransaction();
+    try {
+        $shop = Shop::create([
+            'user_id' => $user_id,
+            'nick_name' => $nick_name,
+            'name' => $name,
+        ]);
+
+        $shop->addMedia($image)->toMediaCollection('shop_logos');
+
+        $shop = Shop::where('id', $shop->id)->with('user', 'user.detail')->first();
+
+        $options = $this->initializeOptions();
+
+        # create request class
+        $request = new \Iyzipay\Request\CreateSubMerchantRequest();
+        $request->setLocale(\Iyzipay\Model\Locale::TR);
+        $request->setConversationId("123456789");
+        $request->setSubMerchantExternalId($shop->id);
+        $request->setSubMerchantType(\Iyzipay\Model\SubMerchantType::LIMITED_OR_JOINT_STOCK_COMPANY);
+        $request->setAddress($address);
+        $request->setTaxOffice($taxOffice);
+        $request->setTaxNumber($taxNumber);
+        $request->setLegalCompanyTitle($legalCompanyName);
+        $request->setEmail($shop->user->email);
+        $request->setGsmNumber($shop->user->detail->phone);
+        $request->setName($name);
+        $request->setIban($Iban);
+        $request->setCurrency(\Iyzipay\Model\Currency::TL);
+
+        # make request
+        $subMerchant = \Iyzipay\Model\SubMerchant::create($request, $options);
+
+        if ($subMerchant->getStatus() =='success'){
+
+            $key = $subMerchant->getSubMerchantKey();
+
+            $shop->detail()->create([
+                'address'=>$address,
+                'Iban'=>$Iban,
+                'shop_type'=>3,
+                'shop_key'=>$key,
+                'commission_rate'=>$rate,
+                'tax_office'=>$taxOffice,
+                'tax_number'=>$taxNumber,
+                'legal_company_title'=>$legalCompanyName
+            ]);
+
+            DB::commit();
+
+            return true ;
+        }
 
 
+    }catch (\Exception $exception){
 
 
+        DB::rollBack();
+    }
+}
+    public  function approveItem($transaction_id){
+            $options = $this->initializeOptions();
+            $request = new \Iyzipay\Request\CreateApprovalRequest();
+            $request->setLocale(\Iyzipay\Model\Locale::TR);
+            $request->setConversationId("123456789");
+            $request->setPaymentTransactionId($transaction_id);
+            $approval = \Iyzipay\Model\Approval::create($request, $options);
+
+            if ($approval->getStatus()=='success'){
+                $item = \App\Models\BasketItem::where('transaction_id',$transaction_id)->first();
+                $item->update(['is_applied'=>1]);
+                return true;
+            }
+
+    }
 }

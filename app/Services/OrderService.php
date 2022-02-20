@@ -10,7 +10,7 @@ class OrderService
 {
 
     public function getOrders(){
-        return Order::all();
+        return Order::orderBy('created_at')->get();
     }
 public  function getOrderDetail($order_id){
     return Order::with('basket','basket.items')->find($order_id);

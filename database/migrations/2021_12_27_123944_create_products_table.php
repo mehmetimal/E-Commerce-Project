@@ -18,6 +18,8 @@ class CreateProductsTable extends Migration
 
             $table->unsignedBigInteger('shop_id');
 
+            $table->unsignedBigInteger('category_id');
+
             $table->string('barcode')->unique();
 
             $table->double('price',10,2);
@@ -33,6 +35,9 @@ class CreateProductsTable extends Migration
             $table->timestamps();
 
             $table->foreign('shop_id')->references('id')->on('shops');
+
+            $table->foreign('category_id')->references('id')->on('categories');
+
         });
     }
 

@@ -14,7 +14,7 @@
 
             <!--products list-->
             <div class="on_list_view_false products nt_products_holder row fl_center row_pr_1 cdt_des_1 round_cd_false nt_cover ratio_nt position_8 space_30 nt_default">
-                @foreach($variants as $variant)
+                @forelse($variants as $variant)
 
 
 
@@ -40,6 +40,7 @@
                                        data-variant_price="{{$variant->price}}"
                                        data-variant_barcode="{{$variant->barcode}}"
                                        data-quantity="1"
+                                       data-shop-id="{{$variant->product->shop->id}}"
                                        data-max_aviable_quantity="{{$variant->quantity}}"
                                        data-image_url="{{isset($variant->getMedia('variants')[0]) ? $variant->getMedia('variants')[0]->getUrl('big') : asset('/images/no_image.png')}}"
                                        href="#" class="pr pr_atc cd br__40 bgw tc dib singleClickAddToCart cb chp ttip_nt tooltip_top_left"><span class="tt_txt">Sepete Ekle</span><i class="iccl iccl-cart"></i><span>Sepete Ekle </span></a>
@@ -58,9 +59,9 @@
                         </div>
                     </div>
 
-
-
-                @endforeach
+                @empty
+                <h1>Aradığınız Ürün Bulunamadı </h1>
+                @endforelse
             </div>
             <!--end products list-->
 

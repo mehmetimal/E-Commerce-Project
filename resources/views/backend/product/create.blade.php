@@ -82,9 +82,25 @@
                             <div id="product_step_1" class="content" role="tabpanel" >
 
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="form-group">
+                                    <div class="row" id="categoriesDiv">
+
+                                        <div class="col ">
+                                            <div id="rootCategories-div">
+
+
+                                                <input type="text" class="form-control" id="rootCategorySearch" placeholder="Ana Kategori Ara" title="Type in a name">
+
+                                                <ul id="rootCategories-list" class="list-unstyled">
+                                                    @foreach($categories as $category)
+
+                                                        <li data-category-id="{{$category->id}}" class="list-group-item "><a href="#" class="header text-warning">{{$category->name}} <i class="fa fa-arrow-right"></i></a></li>
+
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                         {{--   <div class="form-group">
                                                 <label>Kategoriler</label>
                                                 <select required class="duallistbox" multiple="multiple">
                                                     @foreach($categories as $category)
@@ -93,8 +109,8 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <!-- /.form-group -->
-                                        </div>
+                                            <!-- /.form-group -->--}}
+
                                         <!-- /.col -->
                                     </div>
                                     <!-- /.row -->
@@ -167,7 +183,7 @@
                                             <input id="short_description" class="form-control form-control-lg" name="short_description" placeholder="Ürün Kısa Açıklaması ">
                                         </div>
                                     </div>
-                                    <div class="col">
+                                   {{-- <div class="col">
                                         <div class="form-group">
                                             <label>Vergi</label>
                                             <select id="tax" name="tax" type="text" class="form-control" >
@@ -182,14 +198,14 @@
                                                 </option>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div>--}}
                                 </div>
                                 <div class="row">
                                     <div class="col">
                                         <div class="from-group justify-content-between">
                                             <label>Anasayfada Göster <small>Değiştirmek için yandaki butona tıklayınız </small></label>
                                             <div class="float-right">
-                                                <input  id="isSpecial" data-on-text="Göster" data-off-text="Gösterme"   class="float-right" type="checkbox"  name="isSpecial" {{$category->isSpecial==1 ? 'checked' : ''}} data-bootstrap-switch>
+                                                <input  id="isSpecial" data-on-text="Göster" data-off-text="Gösterme"   class="float-right" type="checkbox"  name="isSpecial" data-bootstrap-switch>
 
                                             </div>
                                         </div>
@@ -198,7 +214,7 @@
                                         <div class="from-group justify-content-between">
                                             <label>Anasayfada Göster <small>Değiştirmek için yandaki butona tıklayınız </small></label>
                                             <div class="float-right">
-                                                <input  id="isSlider" data-on-text="Göster" data-off-text="Gösterme"   class="float-right" type="checkbox"  name="isSpecial" {{$category->isSpecial==1 ? 'checked' : ''}} data-bootstrap-switch>
+                                                <input  id="isSlider" data-on-text="Göster" data-off-text="Gösterme"   class="float-right" type="checkbox"  name="isSpecial"  data-bootstrap-switch>
 
                                             </div>
                                         </div>
@@ -275,7 +291,9 @@
                                     <h1>Ürün Detayları </h1>
                                         <label class="form-control" id="product_isSlider_label"></label>
                                         <label class="form-control" id="product_isSpecial_label"></label>
+{{--
                                         <label class="form-control" id="product_tax_label"></label>
+--}}
                                         <label class="form-control" id="product_long_description_label"></label>
                                     </div>
 
@@ -335,7 +353,11 @@
         <script src="{{asset('backend/js/jquery.bootstrap-duallistbox.min.js')}}"></script>
 
         <script type='text/javascript' src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+<script>
 
+
+
+</script>
         {{--initilaize elements--}}
 
         <script>
@@ -394,7 +416,7 @@
 <script>
     let categoryNames=[]
     let isPrevious =false ;
-    let categoryIds;
+    let categoryId;
     let attribute_ids;
     let variantAttributesTmp =[];
     let variants= [];
@@ -403,22 +425,262 @@
     let productDetails={};
     let productCategories = {}
     let shopId;
-  $('#product_step_trigger_1').on('click',function () {
-      $('.productAtrributes').html('');
-     categoryIds = $('.duallistbox').val();
-     categoryNames =$('.duallistbox').text();
+    {{--Üst Kategori Arama --}}
+    $('#rootCategorySearch').keyup(function(){
+        var value = $(this).val().toLowerCase();
+        $('#rootCategories-list li').each(function(){
+            var lcval = $(this).text().toLowerCase();
+            if(lcval.indexOf(value)>-1){
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
 
-     if (categoryIds.length === 0){
+    {{--Depth 1 Categories --}}
+    $('#rootCategories-list li').on('click',function (){
+        $(".subCategoryWrapper").remove();
+        $('.leafCategoryWrappwer').remove();
+        $('.lastLeafWrapper').remove();
+        var listItems = $(".list-group-item");
+        // Remove 'active' tag for all list items
+        $.each(listItems,function (index,item){
+            $(this).removeClass('active')
+        })
+
+        // Add 'active' tag for currently selected item
+        $(this).addClass("active");
+
+        var category_id=$(this).data('category-id');
+        var $category_name=$(this).find('a').text()
+        $.ajax({
+            url: "{{route('getRootDescants')}}",
+            type: "POST",
+            data:{
+                _token:_token,
+                depth:1,
+                categoryId : category_id,
+            },
+            success:function (categories){
+                if(categories.length){
+
+                    $('#categoriesDiv').append(
+                        '<div class="col subCategoryWrapper">'+
+                        '<div id="subCategoryDiv" class="subCategoryDiv">'+
+                        '<input type="text" class="form-control subCategorySearch"  placeholder="'+ $category_name +'  Kategorisinin alt kategorilerinde  Ara " title="Type in a name">'+
+                        '<ul id="" class="list-unstyled subCategoryList">'+
+
+
+                        '</ul>'+
+                        '</div>'+
+                        '</div>'
+
+                    )
+                    $(categories).each(function (index,category) {
+                        $('#categoriesDiv').find('.subCategoryList').append(
+                            '<li data-category-id="'+category.id+'" class="list-group-item subCategory-item"><a href="#" class="header text-warning">'+category.name +'<i class="fa fa-arrow-right"></i></a></li>'
+
+                        )
+                    })
+
+                }
+
+            },
+
+        })
+    });
+
+    $(document).on('keyup','.subCategorySearch',function(){
+
+        var value = $(this).val().toLowerCase();
+
+        $(this).closest('.subCategoryDiv').find('.subCategoryList li').each(function (){
+            var lcval = $(this).text().toLowerCase();
+            if(lcval.indexOf(value)>-1){
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        })
+    })
+
+    $(document).on('click','.subCategory-item',function (){
+        $('.leafCategoryWrappwer').remove();
+        $('.lastLeafWrapper').remove();
+        var listItems = $(this).closest('.subCategoryDiv').find('.subCategoryList li')
+        // Remove 'active' tag for all list items
+
+        $.each(listItems,function (index,item){
+            $(this).removeClass('active')
+
+        })
+
+        // Add 'active' tag for currently selected item
+        $(this).addClass("active");
+        var category_id=$(this).data('category-id');
+        var $category_name=$(this).find('a').text()
+        $.ajax({
+            url: "{{route('getRootDescants')}}",
+            type: "POST",
+            data:{
+                _token:_token,
+                depth:2,
+                categoryId : category_id,
+            },
+            success:function (categories){
+                if(categories.length){
+
+                    $('#categoriesDiv').append(
+                        '<div class="col leafCategoryWrappwer">'+
+                        '<div class="leafDiv">'+
+                        '<input type="text" class="form-control leafCategorySearch"   placeholder="'+ $category_name +'  Kategorisinin alt kategorilerinde  Ara " title="Type in a name">'+
+                        '<ul id="" class="list-unstyled leafCategoryList">'+
+
+
+                        '</ul>'+
+                        '</div>'+
+                        '   </div>'
+
+                    )
+
+                    $(categories).each(function (index,category) {
+                        $('#categoriesDiv').children().last().find('.leafCategoryList').append(
+                            '<li data-category-id="'+category.id+'" class="list-group-item leafCategoryItem"><a href="#" class="header text-warning">'+category.name +'<i class="fa fa-arrow-right"></i></a></li>'
+
+                        )
+                    })
+
+                }else{
+                    categoryId=$(this).data('category-id')
+                }
+
+            },
+
+        })
+
+
+    })
+
+    $(document).on('keyup','.leafCategorySearch',function(){
+
+        var value = $(this).val().toLowerCase();
+
+        $(this).closest('.leafDiv').find('.leafCategoryList li').each(function (){
+            var lcval = $(this).text().toLowerCase();
+            if(lcval.indexOf(value)>-1){
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        })
+    })
+
+    $(document).on('click','.leafCategoryItem',function(){
+        $('.lastLeafWrapper').remove();
+        var listItems = $(this).closest('.leafDiv').find('.leafCategoryList li')
+        // Remove 'active' tag for all list items
+
+        $.each(listItems,function (index,item){
+            $(this).removeClass('active')
+
+        })
+
+        // Add 'active' tag for currently selected item
+        $(this).addClass("active");
+        var category_id=$(this).data('category-id');
+        var category_name=$(this).find('a').text();
+        $.ajax({
+            url: "{{route('getRootDescants')}}",
+            type: "POST",
+            data:{
+                _token:_token,
+                depth:3,
+                categoryId : category_id,
+            },
+            success:function (categories){
+                if(categories.length){
+
+                    $('#categoriesDiv').append(
+                        '<div class="col lastLeafWrapper">'+
+                        '<div class="lastLeafDiv">'+
+                        '<input type="text" class="form-control lastLeafSearch"  placeholder="'+category_name+' Kategorisinin Alt Kategorileri" title="Type in a name">'+
+                        '<ul id="" class="list-unstyled lastLeafList">'+
+
+
+                        '</ul>'+
+                        '</div>'+
+                        '   </div>'
+
+                    )
+
+                    $(categories).each(function (index,category) {
+                        $('#categoriesDiv').children().last().find('.lastLeafList').append(
+                            '<li data-category-id="'+category.id+'" class="list-group-item lastLeafItem"><a href="#" class="header text-warning">'+category.name +'<i class="fas fa-check"></a></li>'
+
+                        )
+                    })
+
+                }else{
+                    categoryId=$(this).data('category-id')
+                }
+
+            },
+
+        })
+
+    })
+
+    $(document).on('keyup','.lastLeafSearch',function(){
+
+        var value = $(this).val().toLowerCase();
+
+        $(this).closest('.lastLeafDiv').find('.lastLeafList li').each(function (){
+            var lcval = $(this).text().toLowerCase();
+            if(lcval.indexOf(value)>-1){
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        })
+    })
+
+    $(document).on('click','.lastLeafItem',function(){
+
+        var listItems = $(this).closest('.lastLeafDiv').find('.lastLeafList li')
+        // Remove 'active' tag for all list items
+
+        $.each(listItems,function (index,item){
+            $(this).removeClass('active')
+
+        })
+        $(this).addClass("active");
+        categoryId=$(this).data('category-id')
+    })
+
+
+
+
+    $('#product_step_trigger_1').on('click',function () {
+      $('.productAtrributes').html('');
+
+
+
+
+
+     if (!categoryId){
         alert('en  az 1 Kategori Secilmeldir ')
         stepper.previous();
         return false ;
     }
+
+
     $.ajax({
         url: "{{route('getCategoryAttributes')}}",
         type: "POST",
         data:{
             _token:_token,
-            categoryIds : categoryIds,
+            categoryId : categoryId,
         },
         success:function (attributes){
 
@@ -602,7 +864,7 @@
 
         var isSpecial= $('#isSpecial').is(':checked'),
             isSlider = $('#isSlider').is(':checked'),
-            tax      = $('#tax').val(),
+         /*   tax      = $('#tax').val(),*/
             short_description =$('#short_description').val();
 
 
@@ -615,19 +877,18 @@
 
             "name":product_name,
             "price":product_price,
+            "category_id":categoryId
 
         }
 
         productDetails={
             'isSlider':isSpecial ,
             'isSpecial':isSlider,
-            'tax':tax,
+          /*  'tax':tax,*/
             'short_description':short_description,
             'long_description': CKEDITOR.instances.long_description.getData() ,
         }
-        productCategories ={
-            "category_ids":categoryIds
-        }
+
 
 
 
@@ -637,11 +898,11 @@
 
         $productName.html('<span class="text-danger"> Ürün Adı : </span>' + ' '  + product.name);
         $productPriceLabel.html('<span class="text-danger"> Ürün Fiyatı</span>'+' ' + product.price);
-        $productCategories.html('<span class="text-danger"> Ürün Kategorileri</span>'+' ' + categoryNames)
+        $productCategories.html('<span class="text-danger"> Ürünün Görüneceği  Kategoriler</span>'+' ' + categoryId)
 
         let $productIsSlider = $('#product_isSlider_label')
         let $productIsSpecial = $('#product_isSpecial_label')
-        let $productTax=$('#product_tax_label')
+
         let $productShortDescriptionLabel = $('#product_short_description_label')
         let $productLongDescriptionLabel= $('#product_long_description_label')
 
@@ -651,7 +912,7 @@
 
         $productIsSlider.html('<span class="text-danger">Ürün Ansayafada Gösterilir</span>' + '  ' + $isSliderForHuman);
         $productIsSpecial.html('<span class="text-danger">Ürün Özel Üründür</span>' + '  ' + $isSpecialForHuman);
-        $productTax.html('<span class="text-danger">Ürün Vergisi</span>'+ '  ' + '%'+ productDetails.tax);
+     /*   $productTax.html('<span class="text-danger">Ürün Vergisi</span>'+ '  ' + '%'+ productDetails.tax);*/
         $productShortDescriptionLabel.html('<span class="text-danger">Ürün Kısa Açıklaması</span>' + '  ' + productDetails.short_description);
         $productLongDescriptionLabel.html('<span class="text-danger">Ürün  Uzun Açıklamsı</span>' + ' ' + CKEDITOR.instances.long_description.document.getBody().getText() )
 
@@ -690,7 +951,7 @@
                 productDetails: productDetails,
                 productAttributes: productAttributes,
                 variants: variants,
-                productCategories: productCategories,
+
             },
             success: function (productId) {
                // var myObject = Object.assign({}, response.variant_ids);

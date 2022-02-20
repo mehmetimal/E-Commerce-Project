@@ -16,7 +16,11 @@ class ShopDetail extends Model
         'tax_number',
         'tax_office',
         'legal_company_title',
-
+        'shop_key',
+        'tax_office',
+        'tax_number',
+        'legal_company_title',
+        'commission_rate'
     ];
     use HasFactory;
 }

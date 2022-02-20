@@ -17,7 +17,7 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         <!-- Navbar Search -->
-        <li class="nav-item">
+ {{--       <li class="nav-item">
             <a class="nav-link" data-widget="navbar-search" href="#" role="button">
                 <i class="fas fa-search"></i>
             </a>
@@ -36,7 +36,7 @@
                     </div>
                 </form>
             </div>
-        </li>
+        </li>--}}
         <!-- Dil Değiştirme -->
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
@@ -55,7 +55,7 @@
                     <!-- Message End -->
                 </a>
                 <div class="dropdown-divider"></div>
-                <a href="#"  data-lang-code="en" class="dropdown-item Langchange">
+               {{-- <a href="#"  data-lang-code="en" class="dropdown-item Langchange">
                     <!-- Message Start -->
                     <div class="media">
                         <div class="media-body">
@@ -75,11 +75,11 @@
                     </div>
                     <!-- Message End -->
                 </a>
-                <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+                <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>--}}
             </div>
         </li>
         <!-- Messages Dropdown Menu -->
-        <li class="nav-item dropdown">
+       {{-- <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-comments"></i>
                 <span class="badge badge-danger navbar-badge">3</span>
@@ -172,7 +172,7 @@
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
                 <i class="fas fa-th-large"></i>
             </a>
-        </li>
+        </li>--}}
     </ul>
 </nav>
 <!-- /.navbar -->

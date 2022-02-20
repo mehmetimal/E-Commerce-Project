@@ -49,13 +49,13 @@
 
 
                                 </div>
-                                <div class="form-group ">
+                                {{--<div class="form-group ">
                                     <label>Anasayfada Göster </label>
                                    <label class="float-right">
                                        <input {{$product->detail->isSlider==1 ? 'checked' : ''}} data-on-text="Göster" data-off-text="Gösterme"   class="float-right" type="checkbox"  name="isSldier" data-bootstrap-switch>
                                    </label>
 
-                                </div>
+                                </div>--}}
                                 @if($errors->has('name'))
                                     <div class="error text-danger "><b>{{ $errors->first('name') }}</b></div>
                                 @endif
@@ -74,14 +74,14 @@
 
 
                         </div>
-                        <div class="form-group ">
+                      {{--  <div class="form-group ">
                             <label>Özel Ürün Mü  </label>
                            <label class="float-right">
 
 
                             <input {{$product->detail->isSpecial==1 ? 'checked' : ''}} data-on-text="Göster" data-off-text="Gösterme"   class="float-right" type="checkbox"  name="isSpecial" data-bootstrap-switch>
                            </label>
-                        </div>
+                        </div>--}}
                     </div>
                 </div>
                 <div class="row">
@@ -94,13 +94,12 @@
                     <div class="col-6">
                         <label>Ürün  Kategorileri  </label>
                         <div class="form-group">
-                            <select name="categories[]"class="form-control categories" multiple>
+                            <select name="category_id"class="form-control categories">
                            @foreach($categories as $category)
                            <option value="{{$category->id}}"
-                           @foreach($product->categories as $productCategory)
 
-                               {{$productCategory->pivot->category_id== $category->id ? 'selected' :''}}
-                           @endforeach>
+
+                               {{$product->category_id== $category->id ? 'selected' :''}}>
                                {{$category->name}}
                             </option>
                            @endforeach

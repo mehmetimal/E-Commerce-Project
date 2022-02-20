@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Services\AttributeService;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
@@ -77,6 +78,7 @@ class CategoryController extends Controller
 
     public function edit(AttributeService $attributeService, $id)
     {
+
         $category = $this->getCategoryService()->getCategoryInfoWithAttributes($id);
 
         $categories = $this->getCategoryService()->getAllCategories();
@@ -94,6 +96,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
+
 
         $this->getCategoryService()->updateCategory($request, $id);
 
@@ -126,9 +129,17 @@ class CategoryController extends Controller
     public function getCategoryAttributes(Request $request)
     {
 
-        $attributes = $this->getCategoryService()->getCategoryAttributes($request->categoryIds);
+        $attributes = $this->getCategoryService()->getCategoryAttributes($request->categoryId);
 
         return response()->json($attributes);
     }
 
+    public function getRootDescants(Request $request){
+        $categories = Category::whereDescendantOf($request->categoryId)->withDepth()->having('depth', '=', $request->depth  )->get();
+        return response()->json($categories);
+    }
+    public function foo(Request $request){
+        $categories = Category::whereDescendantOf($request->categoryId)->hasChildren()->get();
+        return response()->json($categories);
+    }
 }

@@ -189,6 +189,11 @@
                         </ul>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col">
+                        <img src="{{asset('images/iyzico_footer.png')}}">
+                    </div>
+                </div>
             </div>
         </div>
     </div>

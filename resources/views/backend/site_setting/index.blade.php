@@ -81,10 +81,21 @@
                     <hr>
                     <div class="row">
 
-                        <div class="col-sm-12 col-md-4">
+
+                        <div class="col-sm-12 col-md-6">
+                            <div class="form-group">
+                            <label>Kargo Fiyatı</label>
                             <input type="number" value="{{old('cargo_price',$site_settings->cargo_price ?? '')}}" name="cargo_price" class="form-control form-control-lg" placeholder="Kargo Ücreti">
+                            </div>
                         </div>
 
+
+                        <div class="col-sm-12 col-md-6">
+                            <div class="form-group">
+                                <label>Kargo Bedava Üst Limit </label>
+                                <input type="number" value="{{old('free_shipment_min_limit',$site_settings->free_shipment_min_limit ?? '')}}" name="free_shipment_min_limit" class="form-control form-control-lg" placeholder="Kargo Ücreti">
+                            </div>
+                        </div>
                     </div>
 
 

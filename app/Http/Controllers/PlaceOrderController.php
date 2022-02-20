@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 
+use App\Models\Order;
 use App\Models\SiteSetting;
 use App\Models\Variant;
 use App\Services\PlaceOrderService;
@@ -36,13 +37,12 @@ class PlaceOrderController extends Controller
 
     public  function placeOrder(Request $request)
     {
-
         $request->flash();
-        $site_setting=SiteSetting::find(1);
+
+        $price = $this->getPlaceOrderService()->calculateCartPrice();
+
 
         $hasAddress = $request->has('user_address') ;
-
-        $price = \Cart::subTotal( 9, '.', 2 ) + $site_setting->cargo_price;
 
         $userAddressEmailAndId = $this->getPlaceOrderService()->getBuyerAddressAndId($hasAddress,$request->user_address,$request->address_user_name,$request->address_user_surname,$request->address_user_phone,$request->address_user_description,$request->address_user_province,$request->address_user_district,$request->user_email);
 
@@ -51,7 +51,7 @@ class PlaceOrderController extends Controller
         $basket_id= $this->getPlaceOrderService()->fillBasket($userAddressEmailAndId->user_id);
 
 
-       $response  =  $this->getPlaceOrderService()->processVariantIsAllReadyAviable();
+        $response  =  $this->getPlaceOrderService()->processVariantIsAllReadyAviable();
 
        if ($response){
            return back()->with([
@@ -61,11 +61,11 @@ class PlaceOrderController extends Controller
        }
 
 
-        if ($request->payment_method  ==  1){
+        if ($request->payment_method  ==  Order::$PAY_FROM_HOME){
 
-          $order  =  $this->getPlaceOrderService()->storeOrder($price,$address,$basket_id,1,null,null);
+          $order  =  $this->getPlaceOrderService()->storeOrder($price,$address,$basket_id,Order::$PAY_FROM_HOME,null,null);
 
-        }elseif($request->payment_method == 2){
+        }elseif($request->payment_method == Order::$CREDIT_CARD_PAYMENT){
 
            $order = $this->getPlaceOrderService()->placeOrderCredit(
                 $price,
@@ -94,8 +94,6 @@ if(isset($order->id)){
             'order_success'=>'Siparişiniz Tarafımıza Başarıyla Ulaştı'
         ]);
     }
-
-
 }else{
     return back()->with([
         'error'=>$order

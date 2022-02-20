@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+    public  static  $CREDIT_CARD_PAYMENT = 2;
+    public  static  $PAY_FROM_HOME = 1;
     use HasFactory;
     protected $fillable = [
         "basket_id",
@@ -30,6 +32,8 @@ class Order extends Model
         'TESLİM EDİLDİ',
         'İPTAL EDİLDİ'
     ];
+
+
     public function basket(){
         return $this->belongsTo(Basket::class);
     }

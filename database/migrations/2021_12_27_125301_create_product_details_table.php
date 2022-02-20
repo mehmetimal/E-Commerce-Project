@@ -18,7 +18,7 @@ class CreateProductDetailsTable extends Migration
             $table->unsignedBigInteger('product_id')->unsigned();
             $table->boolean('isSlider')->default(0);
             $table->boolean('isSpecial')->default(0);
-            $table->integer('tax');
+            $table->integer('tax')->nullable();
             $table->text('long_description')->nullable();
             $table->string('short_description')->nullable();
             $table->Integer('viewCount')->default(0);

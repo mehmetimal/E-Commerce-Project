@@ -46,10 +46,10 @@
                 <p class="mb__5 d-flex"><i class="las la-phone fs__20 mr__10 text-primary"></i> {{$site_setting->phone}}</p>
                 <p class="mb__5 d-flex"><i class="las la-envelope fs__20 mr__10 text-primary"></i> {{$site_setting->phone}}</p>
                 <a href="https://wa.me/{{$site_setting->phone}}?text=Merhaba%20Bir%20Konuda%20Bilgi%20Almak%20İstiyorum"><p class="mb__5 d-flex"><i class="lab  la-whatsapp fs__20 mr__10 text-primary"></i> WhatssApp İletişim </p></a>
-                <p class="mb__5 d-flex"><i class="lab la-instagram fs__20 mr__10 text-primary"></i> {{$site_setting->instagram}}</p>
-                <p class="mb__5 d-flex"><i class="lab  la-facebook fs__20 mr__10 text-primary"></i> {{$site_setting->facebook}}</p>
-                <p class="mb__5 d-flex"><i class="lab  la-pinterest fs__20 mr__10 text-primary"></i> {{$site_setting->pinterest}}</p>
-                <p class="mb__5 d-flex"><i class="las la-clock fs__20 mr__10 text-primary"></i> Hergün  9:00-17:00</p>
+                <a href="{{$site_setting->instagram}}"><p class="mb__5 d-flex"><i class="lab la-instagram fs__20 mr__10 text-primary"></i> Instagram Sayfamız</p></a>
+                    <a href="{{$site_setting->facebook}}"><p class="mb__5 d-flex"><i class="lab  la-facebook fs__20 mr__10 text-primary"></i> Faceook Sayfamız</p></a>
+                    <a href="{{$site_setting->pinterest}}"><p class="mb__5 d-flex"><i class="lab  la-pinterest fs__20 mr__10 text-primary"></i> Pinterest Sayfamız</p></a>
+                <a><p class="mb__5 d-flex"><i class="las la-clock fs__20 mr__10 text-primary"></i> Hergün  9:00-17:00</p>
             </div>
         </div>
     </div>

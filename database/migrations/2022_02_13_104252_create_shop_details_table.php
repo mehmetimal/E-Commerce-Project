@@ -23,6 +23,8 @@ class CreateShopDetailsTable extends Migration
             $table->string('tax_number')->nullable();
             $table->string('tax_office')->nullable();
             $table->string('legal_company_title')->nullable();
+            $table->string('shop_key');
+            $table->double('commission_rate');
             $table->timestamps();
 
             $table->foreign('shop_id')

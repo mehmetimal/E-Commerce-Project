@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['middleware' => ['role:Super Admin|Admin|Shop','auth']], function () {
+    Route::get('panel',[\App\Http\Controllers\DashboardController::class,'index'])->name('dashboard');
     Route::resource('category',CategoryController::class);
 
     Route::post('category/get-category-info-with.attributes',[CategoryController::class,'getCategoryInfoWithAttributes'])->name('get.category.info.with.attributes');
@@ -81,6 +82,13 @@ Route::group(['middleware' => ['role:Super Admin|Admin|Shop','auth']], function 
     Route::get('site-yorumlari',[\App\Http\Controllers\SiteRatingController::class,'index'])->name('site_rating.index');
 
     Route::get('site-yorum-onay-guncelle/{comment_id}/{is_published}',[\App\Http\Controllers\SiteRatingController::class,'updateIsPublished'])->name('update.is.published');
+
+
+    Route::get('urun-ondayla/{transaction_id}',[\App\Http\Controllers\OrderController::class,'approveItem'])->name('approve.item');
+
+    Route::post('kategori-altkategorileri',[\App\Http\Controllers\CategoryController::class,'getRootDescants'])->name('getRootDescants');
+
+
 
 });
 

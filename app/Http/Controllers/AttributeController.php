@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Attribute;
+
+
+use App\Http\Requests\attribute\AttributeShowRequest;
+use App\Http\Requests\attribute\AttributeSlugExistsRequest;
+use App\Http\Requests\attribute\AttributeStoreRequest;
+use App\Http\Requests\attribute\AttributeUpdateRequest;
+use App\Http\Requests\attribute\AttributeValueExistsRequest;
+use App\Http\Requests\attribute\AttributeWithValuesRequest;
 use App\Services\AttributeService;
 use App\Services\AttributeValueService;
 use Illuminate\Http\Request;
@@ -11,6 +18,7 @@ class AttributeController extends Controller
 {
 
     private $attributeService;
+
     public function __construct()
     {
         $this->middleware('permission:Read Attribute')->only('index', 'show');
@@ -36,17 +44,15 @@ class AttributeController extends Controller
         ]);
     }
 
-
     public function create()
     {
         return view('backend.attribute.create');
     }
 
-
-    public function store(AttributeValueService  $attributeValueService,Request $request)
+    public function store(AttributeValueService  $attributeValueService,AttributeStoreRequest $request)
     {
 
-         $this->getAttributeService()->storeAttribute($request);
+         $this->getAttributeService()->storeAttribute($request->name);
          $attributeValueService->storeAttributeValue($request->name,$request->values);
 
           return back()->with([
@@ -54,10 +60,8 @@ class AttributeController extends Controller
           ]);
     }
 
-    public function show(Request $request)
+    public function show(AttributeShowRequest $request)
     {
-
-
         $attribute = $this->getAttributeService()->getAttribute($request->attribute_id);
 
          return response()->json($attribute);
@@ -74,7 +78,7 @@ class AttributeController extends Controller
 
     }
 
-    public function update(Request $request)
+    public function update(AttributeUpdateRequest $request)
     {
 
         $response = $this->getAttributeService()->updateAttribute($request->oldAttributeName,$request->attributeName);
@@ -90,20 +94,22 @@ class AttributeController extends Controller
         ]);
     }
 
-    public  function isAttributeSlugExists(Request $request){
-       $isExists = $this->getAttributeService()->isAttributeSlugExists($request);
+    public  function isAttributeSlugExists(AttributeSlugExistsRequest $request){
+
+       $isExists = $this->getAttributeService()->isAttributeSlugExists($request->attributeName);
 
        return response()->json($isExists);
     }
 
-    public function isAttributeValueExists(Request $request)
+    public function isAttributeValueExists(AttributeValueExistsRequest $request)
     {
-       $isExists = $this->getAttributeService()->isAttributeValueExists($request);
+
+       $isExists = $this->getAttributeService()->isAttributeValueExists($request->attributeValue);
 
        return response()->json($isExists);
     }
 
-    public  function getAttributesWithValues(Request $request){
+    public  function getAttributesWithValues(AttributeWithValuesRequest $request){
 
         $attributeWithValues = $this->getAttributeService()->getAttributesWithValues($request->attributeIds);
 

@@ -2,9 +2,11 @@
 
 
 namespace App\Services;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Models\Basket;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\SiteSetting;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\UserDetail;
@@ -66,7 +68,7 @@ class PlaceOrderService
         }
 
     }
-   public  function getUserEmailAndId($user_address_id){
+    public  function getUserEmailAndId($user_address_id){
 
        return UserAddress::where('id',$user_address_id)->first();
 
@@ -78,7 +80,8 @@ class PlaceOrderService
            ['password' => Hash::make(Str::random(8))]
 
        );
-       //$user->assignRole(2);
+
+       $user->assignRole('Standard User');
 
        $user->detail()->save(new UserDetail());
 
@@ -100,29 +103,12 @@ public function  initilazeAdrressFromForm($name,$surname,$phone,$description,$pr
 }
 
 
-    public  function storeOrder($price, $address, $basket_id, $payment_method, $bank, $installment){
+    public  function storeOrder($price, $address, $basket_id, $payment_method, $bank, $installment,$basket_items=null){
 
         try {
-
             $basket = Basket::find($basket_id);
 
-
-            foreach (\Cart::content() as $item) {
-
-
-
-
-
-                BasketItem::create([
-                    'basket_id'=>$basket_id,
-                    'name'=>$item->name .' '.$item->options->product_name,
-                    'qty'=>$item->qty,
-                    'price'=>$item->price,
-                    'is_refunded'=>0,
-                    'image_url'=>$item->options->images
-                ]);
-            }
-
+            $this->fillBasketItemsByPaymentMethod($payment_method,$basket_id,$basket_items);
 
             $order = Order::create([
                 'basket_id'=>$basket_id,
@@ -136,7 +122,7 @@ public function  initilazeAdrressFromForm($name,$surname,$phone,$description,$pr
                 'order_type'=>$payment_method,
                 'bank'=>$bank,
                 'installment'=>$installment,
-                'state'=>'Sipariş Alındı',
+                'state'=>Order::$orderStatus[0],
             ]);
 
 
@@ -183,12 +169,17 @@ public function  initilazeAdrressFromForm($name,$surname,$phone,$description,$pr
         $payment_result  = \Iyzipay\Model\Payment::create($iyzico_payment, $options);
 
 
+
         if ($payment_result->getStatus() =='success'){
             $order = $this->storeOrder(
                 $payment_result->getPaidPrice(),
-                $address,$payment_result->getBasketId(),
-                2,$payment_result->getCardFamily(),
-                1);
+                $address,
+                $payment_result->getBasketId(),
+                Order::$CREDIT_CARD_PAYMENT,$payment_result->getCardFamily(),
+                1,
+                $payment_result->getPaymentItems()
+            );
+
             return  $order;
         }else{
             return $payment_result->getErrorMessage();
@@ -240,4 +231,57 @@ public function  initilazeAdrressFromForm($name,$surname,$phone,$description,$pr
 
         }
     }
+   public  function calculateCartPrice(){
+       $site_setting=SiteSetting::find(1);
+
+       $price = \Cart::subTotal( 9, '.', 2 );
+
+
+       if ($price < $site_setting->free_shipment_min_limit){
+          $price = $price +(collect(\Cart::content())->groupBy('options.shop_id')->count() * $site_setting->cargo_price);
+       }
+
+        return $price ;
+   }
+   public  function fillBasketItemsByPaymentMethod($payment_method,$basket_id,$basket_items ){
+       if ($payment_method == Order::$CREDIT_CARD_PAYMENT){
+           $piece = 0;
+           foreach (\Cart::content() as $item) {
+
+               BasketItem::create([
+                   'basket_id'=>$basket_id,
+                   'name'=>$item->name .' '.$item->options->product_name,
+                   'qty'=>$item->qty,
+                   'price'=>$item->price,
+                   'is_refunded'=>0,
+                   'image_url'=>$item->options->images,
+                   'transaction_id'=>$basket_items[$piece]->getPaymentTransactionId()
+               ]);
+               $piece++;
+           }
+
+       }elseif ($payment_method ==Order::$PAY_FROM_HOME ){
+
+
+           foreach (\Cart::content() as $item) {
+
+               BasketItem::create([
+                   'basket_id'=>$basket_id,
+                   'name'=>$item->name .' '.$item->options->product_name,
+                   'qty'=>$item->qty,
+                   'price'=>$item->price,
+                   'is_refunded'=>0,
+                   'image_url'=>$item->options->images,
+               ]);
+
+           }
+
+       }else{
+
+
+           return "invalid payment Type";
+       }
+
+
+   }
 }

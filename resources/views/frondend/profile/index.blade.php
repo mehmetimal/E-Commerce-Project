@@ -27,7 +27,7 @@
                                 <td>SP-{{$order->id}}</td>
                                 <td>{{$order->created_at}}</td>
                                 <td>{{$order->state}}</td>
-                                <td>{{$order->price}}</td>
+                                <td>{{$order->price}} ₺</td>
                                 <td><a href="{{route('order.detail',$order->id)}}">Sipariş Detayı-></a></td>
                             </tr>
                           @endforeach

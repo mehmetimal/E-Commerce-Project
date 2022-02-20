@@ -64,6 +64,7 @@
                                 <span class="sku_wrapper"><span class="cb">ÜRÜN KODU  :</span> <span class="sku value cg" id="variant_barcode"></span></span>
                                 <span class="sku_wrapper"><span class="cb">ÜRÜN ADEDİ  :</span> <span class="sku value cg" id="variant_quantity_text"></span></span>
                                 <span class="sku_wrapper"><span class="cb">KISA AÇIKLAMA   :</span> <span class="sku value cg" id="product_short_description"></span></span>
+                                <input id="shop_id" type="hidden" value="">
                                 <span class="posted_in"><span class="cb">Tüm Ana Kategoriler :</span>
                                  @foreach($root_categories as $rootCategory)
                                         <a href="{{route('shopping',$rootCategory->id)}}" class="cg" title="Accessories">{{$rootCategory->name}}</a>
@@ -173,7 +174,7 @@
                             $('#variant_barcode').text(variant_detail.variant.barcode)
                             $('#product_short_description').text(variant_detail.variant.product.detail.short_description)
                             $('#variant_quantity_text').text(variant_detail.variant.quantity)
-
+                            $('#shop_id').val(variant_detail.variant.product.shop.id)
                             $("#quantity").attr({
                                 "data-max-quantity" : variant_detail.variant.quantity,
                             });

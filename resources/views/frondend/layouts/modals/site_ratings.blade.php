@@ -9,7 +9,7 @@
                 </button>
             </div>
             <form action="{{route('store.site.rating')}}" method="Post">
-           @csrf
+            @csrf
             <div class="row mb-2">
                <div class="col">
                    <label>Adınız</label>

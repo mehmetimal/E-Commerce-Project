@@ -197,11 +197,26 @@
                                         </tr>
                                         <tr class="cart_item">
                                             <th>Kargo Ücreti  </th>
-                                            <td><span class="cart_price">{{$site_setting->cargo_price}}₺</span></td>
+                                            <td><span class="cart_price">
+                                                    @if(\Cart::subTotal( 2, '.', '' ) > $site_setting->free_shipment_min_limit)
+                                                        Kargo Bedava
+                                                    @else
+
+                                                        {{$site_setting->cargo_price * collect(\Cart::content())->groupBy('options.shop_id')->count()}} ₺
+                                                    @endif
+                                                </span></td>
                                         </tr>
                                         <tr class="order-total cart_item">
                                             <th>Toplam </th>
-                                            <td><strong><span class="cart_price amount">{{Cart::subTotal( 2, '.', '' ) + $site_setting->cargo_price}} ₺  </span></strong></td>
+                                            <td><strong><span class="cart_price amount">
+                                                    @if(\Cart::subTotal( 2, '.', '' ) > $site_setting->free_shipment_min_limit)
+                                                           {{\Cart::subTotal( 2, '.', '' )}}  ₺
+                                                        @else
+                                                        {{\Cart::subTotal( 2, '.', '' )  + (collect(\Cart::content())->groupBy('options.shop_id')->count() * $site_setting->cargo_price)}} ₺
+
+                                                    @endif
+
+                                                    </span></strong></td>
                                         </tr>
                                         </tfoot>
                                     </table>
@@ -239,7 +254,7 @@
                                                         <div class="form-row form-row-wide">
                                                             <label for="stripe-card-element">Kart Numarası<span class="required">*</span></label>
                                                             <div class="stripe-card-group">
-                                                                <input type="text" name="payment_card_number" id="payment_card_number" value="" placeholder="1234 1234 1234 1234">
+                                                                <input id="cc" name="payment_card_number" type="text" data-inputmask="'mask': '9999 9999 9999 9999'" />
                                                                 <i class="stripe-credit-card-brand stripe-card-brand" alt="Credit Card"></i>
                                                             </div>
                                                         </div>
@@ -297,8 +312,11 @@
         </div>
     </div>
 @push('js')
+    <script type='text/javascript' src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
     <script>
-
+        $("#cc").inputmask({
+        removeMaskOnSubmit: true
+        });
         $("#checkoutForm").validate({
             rules: {
                 address_user_name:{
@@ -367,9 +385,9 @@
                 },
                 payment_card_number:{
                     required: '.input-radio[value="2"]:checked',
-                    digits: true,
 
-                    min:16
+
+
                 },
                 payment_card_expire_date_year:{
                     required: '.input-radio[value="2"]:checked'
@@ -416,9 +434,7 @@
                 },
                 payment_card_number:{
                     required:"Kart Numarası Girilmelidir  ",
-                    digits: "Kart Numarası Sadece Sayılardan Oluşabilir",
 
-                    min:"Kart Numarası 16 HANELİ Olmalıdır "
                 },
                 payment_card_expire_date_year:{
                     required:"Kart Son Kullanım Yılı Seçilmelidir  ",
@@ -443,6 +459,7 @@
         })
         $('#checkoutForm').submit(function(){
             $(this).find('input[type=submit]').prop('disabled', true);
+
         });
     </script>
     <script>

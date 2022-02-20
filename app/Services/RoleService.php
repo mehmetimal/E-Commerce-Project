@@ -17,15 +17,16 @@ public  function getRole($role_id){
     return Role::with('permissions')->findOrFail($role_id);
 }
 
-public  function storeRole(Request $request){
+public  function storeRole($name){
     Role::create([
-       'name'=>$request->name,
+       'name'=>$name,
     ]);
 }
-public function updateRole(Request $request,$role_id){
-   $role = Role::findOrFail($role_id);
+public function updateRole($permissions,$role_id){
 
-    $role->syncPermissions($request->permissions);
+    $role = Role::findOrFail($role_id);
+
+    $role->syncPermissions($permissions);
 }
 
 }

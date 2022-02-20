@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{{asset('backend/css/buttons.bootstrap4.min.css')}}">
 
 @endpush
-@section('currentPage','Kategoriler')
+@section('currentPage','Site Yorumları')
 
 
 @section('content')

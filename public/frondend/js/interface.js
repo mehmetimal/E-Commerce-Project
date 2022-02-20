@@ -2157,11 +2157,12 @@
             $variant_name=$(this).data('variant_name'),
             $variant_price=$(this).data('variant_price'),
             $variant_barcode=$(this).data('variant_barcode'),
-            $quantity=$(this).data('quantity'),
-            $max_aviable_quantity=$(this).data('max_aviable_quantity'),
-            $image_url=$(this).data('image_url');
 
-        addItemFromView($product_name, $variant_name, $variant_price, $variant_barcode, $quantity, $max_aviable_quantity, $image_url);
+            $max_aviable_quantity=$(this).data('max_aviable_quantity'),
+            $image_url=$(this).data('image_url'),
+            $shop_id=$(this).data('shop-id');
+
+        addItemFromView($product_name, $variant_name, $variant_price, $variant_barcode, 1, $max_aviable_quantity, $image_url,$shop_id);
         console.log('Ürün Eklendi !');
         let mini_cart_block$ = $( '#nt_cart_canvas' ),
             btn$             = $( this );
@@ -2870,6 +2871,7 @@ function addItemToCartFromDetail(){
     const variant_barcode_for_cart = $('#variant_barcode').text();
     const quantity_for_cart  =    $('#quick_view_quantity_input').val();
     const max_aviable_quantity_for_variant = $('#variant_quantity_text').text();
+    const shop_id = $('#shop_id').val();
     const image_url_for_cart =$("#variant_images_div > div >span").first().data('bgset');
 
 
@@ -2884,7 +2886,8 @@ function addItemToCartFromDetail(){
             price:variant_price_for_cart,
             product_name:product_name_for_cart,
             image:image_url_for_cart,
-            max_quantity:max_aviable_quantity_for_variant
+            max_quantity:max_aviable_quantity_for_variant,
+            shop_id:shop_id
         },
         success: function (data) {
             getCartTotal();
@@ -2894,7 +2897,7 @@ function addItemToCartFromDetail(){
     });
 }
 
-function  addItemFromView($product_name, $variant_name, $variant_price, $variant_barcode, $quantity, $max_aviable_quantity, $image_url){
+function  addItemFromView($product_name, $variant_name, $variant_price, $variant_barcode, $quantity, $max_aviable_quantity, $image_url,$shop_id){
     let _token = $('meta[name="csrf-token"]').attr('content');
     $.ajax({
         url: '/add-item-to-cart',
@@ -2907,7 +2910,8 @@ function  addItemFromView($product_name, $variant_name, $variant_price, $variant
             price:$variant_price,
             product_name:$product_name,
             image:$image_url,
-            max_quantity:$max_aviable_quantity
+            max_quantity:$max_aviable_quantity,
+            shop_id:$shop_id
         },
         success: function (data) {
             getCartTotal();

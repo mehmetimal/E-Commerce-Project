@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\order\UpdateOrderRequest;
 use App\Models\Order;
+use App\Services\IyzicoService;
 use App\Services\OrderService;
-use http\Message;
+
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -76,7 +78,7 @@ class OrderController extends Controller
     ]);
     }
 
-    public function update(Request $request,  $order_id)
+    public function update(UpdateOrderRequest $request,  $order_id)
     {
         $this->getOrderService()->updateOrder($request->status,$order_id);
         return back()->with([
@@ -93,5 +95,15 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         //
+    }
+    public  function approveItem(IyzicoService $iyzicoService,$transaction_id){
+
+        $result = $iyzicoService->approveItem($transaction_id);
+
+        if ($result){
+            return back()->with([
+                'message'=>'Ürün Onaylandı !',
+            ]);
+        }
     }
 }

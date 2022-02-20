@@ -7,11 +7,12 @@
 
     <!--category menu-->
     <div class="kalles-section cat-shop pr tc">
-        <a href="#" class="has_icon cat_nav_js dib">Categories<i class="facl facl-angle-down"></i></a>
-        <div class="dn" id="cat_kalles">
-            <ul class="cat_lv_0">
+        <div class="kalles-section cat-shop pr tc">
+            <div class="d-inline" id="cat_kalles">
+                <ul class="  list-inline">
+                    <ul class="cat_lv_0">
                 @foreach($descendantsOfCategory as $descendants)
-                    <li class="cat-item"><a class="cat_link dib" href="{{route('shopping',$descendants->id)}}">{{$descendants->name}}</a></li>
+                 <li class=" list-inline-item"><a class="cat_link dib" href="{{route('shopping',$descendants->id)}}">{{$descendants->name}}</a></li>
                 @endforeach
             </ul>
         </div>
@@ -22,9 +23,11 @@
         @include('frondend.layouts.filterControl')
 
         @include('frondend.layouts.dynamicFilter')
+<div id="variantList">
 
-            @include('frondend.layouts.variantList')
 
+        @include('frondend.layouts.variantList')
+</div>
 
     </div>
 

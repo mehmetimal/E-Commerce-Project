@@ -120,7 +120,10 @@
                             @csrf
                             <button class="button   button_primary "> Güvenli Çıkış  <i class="fa fa-sign-out"></i> </button>
                         </form>
+                        @role('Super Admin|Shop|Admin')
+                        <a href="{{route('dashboard')}}" class="button button_primary text-center w__60  justify-content-center align-self-center">Yönetim Paneli <i class="iccl iccl-user"></i></a>
 
+                        @endrole
 
                     </div>
                 </div>

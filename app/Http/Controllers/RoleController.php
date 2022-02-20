@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\role\StoreRoleRequest;
+use App\Http\Requests\role\UpdateRoleRequest;
 use App\Services\PermissionService;
 use App\Services\RoleService;
 use http\Message;
@@ -48,9 +50,9 @@ class RoleController extends Controller
         return view('backend.user.role.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $this->getRoleService()->storeRole($request);
+        $this->getRoleService()->storeRole($request->name);
 
         return back()->with([
             'message'=>'Role Basarılı Bir sekilde Eklendi !'
@@ -75,9 +77,9 @@ class RoleController extends Controller
         ]);
     }
 
-    public function update(Request $request, $role_id)
+    public function update(UpdateRoleRequest $request, $role_id)
     {
-        $this->getRoleService()->updateRole($request,$role_id);
+        $this->getRoleService()->updateRole($request->permissions,$role_id);
         return back()->with([
             'message'=>'Rol Guncellendi !',
         ]);

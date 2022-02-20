@@ -7,7 +7,7 @@
         </div>
         <div class="cart_threshold cart_thres_js">
             <div class="cart_thres_2">Kampanya !
-                <span class="cr fwm mn_thres_js">300 TL ve Üzeri </span> Alışverişlerde  <span class="cr fwm">Kargo Bedava </span>
+                <span class="cr fwm mn_thres_js">{{$site_setting->free_shipment_min_limit}} TL ve Üzeri </span> Alışverişlerde  <span class="cr fwm">Kargo Bedava </span>
             </div>
         </div>
         <div class="mini_cart_wrap">
@@ -16,7 +16,7 @@
                     <div class="empty tc mt__40 dn"><i class="las la-shopping-bag pr mb__10"></i>
                         <p>Sepetiniz Boş.</p>
                         <p class="return-to-shop mb__15">
-                            <a class="button button_primary tu js_add_ld" href="shop-filter-sidebar.html">Return To Shop</a>
+                            <a class="button button_primary tu js_add_ld" href="{{route('index')}}">Alışverişe Geri Dön </a>
                         </p>
                     </div>
                     <div class="mini_cart_items js_cat_items lazyload"  id="cart_items">

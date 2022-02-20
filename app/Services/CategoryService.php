@@ -164,4 +164,8 @@ public  function updateCategory(Request $request,$category_id){
 
 
     }
+    public  function getDescants($category_id){
+        return Category::descendantsOf($category_id);
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Services\CategoryService;
 use App\Services\ProductService;
@@ -48,7 +49,7 @@ class ProductController extends Controller
 
     public function create(ShopService $shopService, CategoryService $categoryService)
     {
-        $categories = $categoryService->getAllCategories();
+        $categories =  Category::whereIsRoot()->get();
 
         $shops = $shopService->getShopsByRole();
 

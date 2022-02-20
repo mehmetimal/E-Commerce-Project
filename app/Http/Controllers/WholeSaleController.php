@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\whole_sale\StoreWholeSaleRequest;
+use App\Http\Requests\whole_sale\UpdateWholeSaleRequest;
 use App\Models\WholeSale;
 use App\Services\ProductService;
 use App\Services\WholeSaleService;
@@ -46,12 +48,12 @@ class WholeSaleController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(StoreWholeSaleRequest $request)
     {
         $this->getWholeSaleService()->storeWholeSale($request->product_id,$request->price,$request->description);
-   return back()->with([
-       'message'=>"Ürün Toptan Satışa Eklendi !"
-   ]);
+           return back()->with([
+               'message'=>"Ürün Toptan Satışa Eklendi !"
+           ]);
     }
 
     /**
@@ -76,7 +78,7 @@ class WholeSaleController extends Controller
     }
 
 
-    public function update(Request $request, $wholeSale_id)
+    public function update(UpdateWholeSaleRequest $request, $wholeSale_id)
     {
         $this->getWholeSaleService()->updateWholeSale($request->price,$request->description,$wholeSale_id);
     return back()->with([

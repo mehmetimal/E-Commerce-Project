@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\user\UpdateUserRequest;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -73,6 +74,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user =User::with('detail','roles')->findOrFail($id);
+
         $roles = Role::all();
         return view('backend.user.edit')->with([
             'roles'=>$roles,
@@ -81,7 +83,7 @@ class UserController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
        $user = User::with('detail')->findOrFail($id);
 

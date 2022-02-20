@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\faq\StoreFaqRequest;
 use App\Models\Faq;
 use App\Services\FaqService;
 use Illuminate\Http\Request;
@@ -40,12 +41,12 @@ class FaqController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(StoreFaqRequest $request)
     {
         $this->getFaqService()->storeFaq($request->question,$request->answer);
-    return back()->with([
-        'message'=>'Soru Eklendi',
-    ]);
+        return back()->with([
+            'message'=>'Soru Eklendi',
+        ]);
     }
 
     /**

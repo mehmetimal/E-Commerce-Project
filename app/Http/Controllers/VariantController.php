@@ -24,7 +24,7 @@ class VariantController extends Controller
         $this->middleware('permission:Delete Variant')->only('destroy');
 
 
-        $this->middleware('role:Admin|Super Admin')->only('updateIsPublished');
+        $this->middleware('role:Super Admin')->only('updateIsPublished');
 
 
         $this->variantService = new VariantService();

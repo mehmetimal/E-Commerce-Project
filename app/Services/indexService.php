@@ -8,6 +8,7 @@ use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Contact;
 use App\Models\Faq;
+use App\Models\Product;
 use App\Models\Shop;
 use App\Models\SiteRating;
 use App\Models\SiteSetting;
@@ -38,19 +39,18 @@ public function getAttributesForVariants($variants){
    }
 
 }
-    public function getIndexVariantsAfterFiltering($categoryIds ,$shopIds,$priceRange){
-if ($priceRange ){
-    $priceSplited = explode('-',$priceRange);
-}else{
-    $priceSplited =null;
-}
+    public function getIndexVariantsAfterFiltering($categoryId ,$shopIds,$priceRange){
+        if ($priceRange ){
+            $priceSplited = explode('-',$priceRange);
+        }else{
+            $priceSplited =null;
+        }
+        return  Variant::when($categoryId,function ($filterByCategory) use($categoryId){
 
+            $filterByCategory->whereHas('product',function ($productCategoryQuery) use($categoryId){
+                $category = Category::descendantsAndSelf($categoryId)->pluck('id')->values();
 
-        return  Variant::when($categoryIds,function ($filterByCategory) use($categoryIds){
-
-            $filterByCategory->whereHas('product.categories',function ($productCategoryQuery) use($categoryIds){
-
-                $productCategoryQuery->whereIn('category_id',$categoryIds);
+                $productCategoryQuery->whereIn('category_id',$category)->orWhere('category_id',$categoryId);
 
             });
 
@@ -78,8 +78,11 @@ if ($priceRange ){
     }
     public  function getVariantsByCategory($category_id){
 
-        return Variant::whereHas('product.categories',function ($productCategoryQuery) use($category_id){
-            $productCategoryQuery->where('category_id',$category_id);
+        return Variant::whereHas('product',function ($productCategoryQuery) use($category_id){
+
+            $category = Category::descendantsAndSelf($category_id)->pluck('id')->values();
+
+            $productCategoryQuery->whereIn('category_id',$category);
         })->where('is_sold',0)->where('is_published',1)->paginate(20);
 
     }
@@ -97,7 +100,7 @@ if ($priceRange ){
         return Category::findOrFail($category_id);
     }
     public  function getVariantDetail($variant_id){
-        return Variant::with('product.detail','media')->findOrFail($variant_id);
+        return Variant::with('product.detail','product.shop','media')->findOrFail($variant_id);
 
     }
     public function getShopVariants($shop_id){
@@ -116,9 +119,15 @@ if ($priceRange ){
         })->where('is_sold',0)->where('is_published',1)->paginate(20);
     }
     public  function getCategoryByProductId($product_id){
-       return  Category::whereHas('products',function ($productQuery)use($product_id){
-            $productQuery->where('product_id',$product_id);
-        });
+
+
+        $product =Product::findOrFail($product_id);
+
+        $categories = Category::descendantsOf($product->category_id);
+        if ($categories->isEmpty()){
+            return  Category::ancestorsOf($product->category_id);
+        }
+        return $categories;
     }
     public  function storeContactRequest($name, $surname, $email, $phone, $message){
         Contact::create([
@@ -148,5 +157,26 @@ if ($priceRange ){
     }
     public  function getSiteComments(){
         return SiteRating::where('is_published',1)->get();
+    }
+
+    public  function filterVariantByAttribute($attributes){
+
+
+       return Variant::whereHas('attributes', function ($query) use ($attributes) {
+            foreach ($attributes as $i => $attr) {
+                $query->{$i === 0 ? 'where' : 'orWhere'}(function ($query) use ($attr) {
+                    $query
+                        ->where('attribute_id', $attr['attribute_id'])
+                        ->whereIn('value_id', $attr['value_id']);
+                });
+            }
+        })->paginate(20);
+
+    }
+    public  function getRootCategories(){
+        return  Category::whereIsRoot()->get();
+    }
+    public  function getAncestors($category_id){
+       return  Category::ancestorsOf($category_id);
     }
 }

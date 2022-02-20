@@ -21,6 +21,9 @@ class CreateBasketItemsTable extends Migration
             $table->string('image_url');
             $table->decimal('price',10,2);
             $table->boolean('is_refunded')->default(0);
+            $table->integer('transaction_id')->nullable();
+            $table->boolean('is_applied')->default(0);
+
             $table->foreign('basket_id')->references('id')->on('baskets')->onDelete('cascade');
             $table->timestamps();
         });

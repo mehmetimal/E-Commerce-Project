@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BasketItem extends Model
 {
     use HasFactory;
-    protected $fillable=["basket_id","qty","image_url","price","name"];
+    protected $fillable=["basket_id","qty","image_url","price","name","transaction_id","is_applied"];
     public function variant(){
 
         return $this->belongsTo(Variant::class);

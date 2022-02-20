@@ -28,7 +28,7 @@
                         <li class="nav-item">
                             <a href="{{route('order.index')}}" class="nav-link active">
                                 <i class="fas fa-shopping-cart nav-icon"></i>
-                                <p>  {{__('message.order_text')}}</p>
+                                <p>  Siparişler </p>
                             </a>
                         </li>
                         <li class="nav-item">

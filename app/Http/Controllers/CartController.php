@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\basket\AddItemRequest;
+use App\Http\Requests\basket\DeleteItemRequest;
 use App\Services\CartService;
 use App\Services\CategoryService;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -24,10 +26,9 @@ class CartController extends Controller
         return $this->cartService;
     }
 
-    public function addItem(Request $request){
+    public function addItem(AddItemRequest $request){
 
-
-        $this->getCartService()->addItem($request->barcode,$request->name,$request->quantity,$request->price,$request->product_name,$request->image,$request->max_quantity);
+        $this->getCartService()->addItem($request->barcode,$request->name,$request->quantity,$request->price,$request->product_name,$request->image,$request->max_quantity,$request->shop_id);
 
 
         $cart=Cart::content();
@@ -38,7 +39,7 @@ class CartController extends Controller
         ]);
     }
 
-    public function deleteItem(Request $request){
+    public function deleteItem(DeleteItemRequest $request){
         Cart::remove($request->rowId);
     }
     public function getCartTotal(){

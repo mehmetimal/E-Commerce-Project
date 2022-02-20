@@ -74,7 +74,11 @@
 
                 },
                 success: function (variantList) {
-
+if(variantList.length){
+    console.log('var ')
+}else{
+    console.log('yok')
+}
                    document.getElementById('variantList').innerHTML=variantList;
 
                 },

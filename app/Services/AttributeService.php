@@ -3,26 +3,21 @@
 
 namespace App\Services;
 
-
 use App\Models\Attribute;
 use App\Models\AttributeValue;
-use Dflydev\DotAccessData\Data;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use PHPUnit\Exception;
+
 
 class AttributeService
 {
-
-
     public function  getAllAttributes(){
        return  Attribute::all();
     }
-    public  function isAttributeSlugExists(Request $request){
-        return Attribute::where('slug',Str::slug($request->attributeName))->exists();
+    public  function isAttributeSlugExists($name){
+        return Attribute::where('slug',Str::slug($name))->exists();
     }
-    public function isAttributeValueExists(Request $request){
-        return AttributeValue::where('slug',Str::slug($request->attributeValue))->exists();
+    public function isAttributeValueExists($attributeValue){
+        return AttributeValue::where('slug',Str::slug($attributeValue))->exists();
     }
     public  function updateAttribute($attributeOldName,$attributeName){
 
@@ -35,29 +30,22 @@ class AttributeService
                 return  $exception->getMessage();
             }
         }
-
     public function getAttribute($attribute_id){
           return Attribute::with('values')->findOrFail($attribute_id);
 
       }
-
-      public function deleteAttribute($attribute_id){
-
+    public function deleteAttribute($attribute_id){
         return Attribute::destroy($attribute_id);
 
 
       }
-
-public  function getAttributesWithValues($attributeIds){
-
-
-return Attribute::whereIn('id',$attributeIds)->orderByDesc('id')->with('values')->get();
+    public  function getAttributesWithValues($attributeIds){
+    return Attribute::whereIn('id',$attributeIds)->orderByDesc('id')->with('values')->get();
 
     }
-public function storeAttribute(Request $request){
-
+    public function storeAttribute($name){
         Attribute::create([
-            'name'=>$request->name,
+            'name'=>$name,
         ]);
 
 }

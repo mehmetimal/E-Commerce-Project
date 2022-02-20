@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\shop\StoreShopRequest;
 use App\Models\Shop;
 use App\Models\User;
 use App\Services\ShopService;
@@ -46,19 +47,20 @@ class ShopController extends Controller
     {
         $shop_type = \request()->input('shop_type');
 
-        $users=$userService->getAllUsers();
+        $users=$userService->getAllShops();
 
-        if ($shop_type == 1){
+
+        if ($shop_type == Shop::$PERSONAL_SHOP){
 
             return view('backend.shop.createShopByType.personalShop')->with([
                 'users'=>$users
             ]);
-        }elseif ($shop_type == 2){
-            return view('backend.shop.create')->with([
+        }elseif ($shop_type == Shop::$PRIVATE_SHOP){
+            return view('backend.shop.createShopByType.privateShop')->with([
                 'users'=>$users
             ]);
-        }elseif ($shop_type == 3){
-            return view('backend.shop.create')->with([
+        }elseif ($shop_type == Shop::$LIMITED_SHOP){
+            return view('backend.shop.createShopByType.limitedShop')->with([
                 'users'=>$users
             ]);
         }
@@ -68,7 +70,7 @@ class ShopController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(StoreShopRequest $request)
     {
 
         $user = User::with('detail')->find($request->user_id);
@@ -79,11 +81,13 @@ class ShopController extends Controller
             ]);
         }
 
-        $this->getShopService()->storeShopByType($request);
+        $response = $this->getShopService()->storeShopByType($request);
+        if ($response){
+            return back()->with([
+                'message'=>'Dükkan Başarıyla Eklendi !'
+            ]);
+        }
 
-        return back()->with([
-            'message'=>'Dükkan Başarıyla Eklendi !'
-        ]);
     }
 
     /**

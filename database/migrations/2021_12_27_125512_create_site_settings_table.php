@@ -28,6 +28,7 @@ class CreateSiteSettingsTable extends Migration
             $table->text('distance_sales_contract')->nullable();
             $table->text('preliminary_information')->nullable();
             $table->double('cargo_price')->default(15.00);
+            $table->double('free_shipment_min_limit')->default(300);
             $table->timestamps();
         });
     }

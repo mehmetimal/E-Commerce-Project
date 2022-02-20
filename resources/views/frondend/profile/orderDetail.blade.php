@@ -50,7 +50,7 @@
 
                                 <th>Tarih</th>
                                 <th>Durum</th>
-                                <th>Durum</th>
+
                                 <th>Ücret</th>
                             </tr>
                             </thead>
@@ -60,7 +60,7 @@
                                     <td>SP-{{$orderWithDetails->id}}</td>
                                     <td>{{$orderWithDetails->created_at}}</td>
                                     <td>{{$orderWithDetails->state}}</td>
-                                    <td>{{$orderWithDetails->price}}</td>
+                                    <td>{{$orderWithDetails->price}} ₺</td>
                                 </tr>
 
                             </tbody>
@@ -93,10 +93,10 @@
                                 <tr>
                                     <td><img src="{{$basketItem->image_url}}" width="150" height="150"></td>
                                     <td>{{$basketItem->name}}</td>
-                                    <td>{{$basketItem->price}}</td>
+                                    <td>{{$basketItem->price}} ₺</td>
                                     <td>{{$basketItem->qty}}</td>
-                                    <td>{{$basketItem->is_refunded == 1 ? 'İade Edildi' :'İade Edilmedi'}}</a></td>
-                                    <td>{{$basketItem->qty * $basketItem->price}}</a></td>
+                                    <td>{{$basketItem->is_refunded == 1 ? 'İade Edildi' :'İade Edilmedi'}}</td>
+                                    <td>{{$basketItem->qty * $basketItem->price}} ₺</td>
 
                                 </tr>
 
@@ -110,7 +110,7 @@
                                 <td ><b>{{collect($orderWithDetails->basket->items)->sum(function ($item){
 
 return $item->price*$item->qty;
-})}} +KARGO</b></td>
+})}} ₺ +KARGO</b></td>
                             </tr>
                             </tbody>
                         </table>

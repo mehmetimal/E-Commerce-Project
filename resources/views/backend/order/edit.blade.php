@@ -65,7 +65,7 @@
 
                                 <th>Tarih</th>
                                 <th>Durum</th>
-                                <th>Durum</th>
+
                                 <th>Ücret</th>
                             </tr>
                             </thead>
@@ -77,7 +77,11 @@
                                 <td>{{$order->state}}</td>
                                 <td>{{$order->price}}</td>
                             </tr>
-
+                            <tr >
+                                <td colspan="4">
+                                    {{$order->order_type== 1 ?'Kapıda Ödeme ' :'Kredi Kartı'}}
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -110,7 +114,12 @@
                                     <td>{{$basketItem->name}}</td>
                                     <td>{{$basketItem->price}}</td>
                                     <td>{{$basketItem->qty}}</td>
-                                    <td>{{$basketItem->is_refunded == 1 ? 'İade Edildi' :'İade Edilmedi'}}</a></td>
+                                    @if($order->order_type == 2 && $basketItem->is_applied==0)
+                                        <td><a href="{{route('approve.item',$basketItem->transaction_id)}}" class="btn btn-success">Ürünü Onayla</a></td>
+                                    @else
+                                        <td>Kapıda Ödeme Veya Ürün Onaylanmış </td>
+
+                                    @endif
                                     <td>{{$basketItem->qty * $basketItem->price}}</a></td>
 
                                 </tr>

@@ -30,7 +30,9 @@ class ProductService
     }
 
     public function getProduct($product_id){
-       return  Product::with('categories','detail')->findOrFail($product_id);
+       return  Product::whereHas('shop',function ($shopQuery){
+           $shopQuery->where('user_id',Auth::id());
+       })->with('categories','detail')->findOrFail($product_id);
     }
 
     public function  storeProduct(Request $request){
@@ -42,8 +44,6 @@ class ProductService
 
         $productAttributesRequest = $request->productAttributes;
 
-        $productCategoriesRequest=$request->productCategories;
-
         $productRequest["price"] = str_replace('₺', '', $productRequest["price"]);
 
         //ADD PRDDUCT
@@ -51,12 +51,17 @@ class ProductService
 
         $barcode = $this->generateUniqueCode();
 
+        $is_published=Auth::user()->hasRole('Super Admin|Admin') ?  1 : 0;
+
+        $shop_id =Auth::user()->hasRole('Super Admin|Admin') ?  $request->shopId : Auth::id();
+
         $product = Product::create([
+                    'category_id'=>$productRequest["category_id"],
                     'name'=>$productRequest["name"],
                     'price' => $productRequest["price"],
                     'quantity' =>$productTotalQuantity,
-                    'shop_id'=> $request->shopId ,//Dükkanın idsi gelmesi lazım simdlik 1
-                    'is_published' => 1,//Yetki Bazlı Olması lazım şimdlik tamam
+                    'shop_id'=> $shop_id ,//Dükkanın idsi gelmesi lazım simdlik 1
+                    'is_published' => $is_published,//Yetki Bazlı Olması lazım şimdlik tamam
                     'barcode' => $barcode,
 
             ]);
@@ -64,7 +69,6 @@ class ProductService
             $product->detail()->create([
                 'isSlider' => $productDetailsRequest["isSlider"]    ? 1 : 0,
                 'isSpecial' => $productDetailsRequest["isSpecial"]  ? 1 : 0,
-                'tax' => $productDetailsRequest["tax"],
                 'short_description' => $productDetailsRequest["short_description"],
                 'long_description' => $productDetailsRequest["long_description"],
             ]);
@@ -76,13 +80,7 @@ class ProductService
                      'value_id' => $productAttribute["value_id"],
                  ]);
              }
-            foreach ($productCategoriesRequest as $categories){
-                foreach ($categories as $category_id){
-                    $product->categories()->attach([
-                        "category_id"=>$category_id,
-                    ]);
-                }
-            }
+
             return $product->id;
     }
 
@@ -90,15 +88,16 @@ class ProductService
 
         try {
 
-            $product= Product::findOrFail($product_id);
+            $product= Product::whereHas('shop',function ($shopQuery){
+                $shopQuery->where('user_id',Auth::id());
+            })->findOrFail($product_id);
 
             $product->update([
+                'category_id'=>$request->category_id,
                 'name'=>$request->name,
                 'price'=>$request->price,
                 'is_published'=>1,
             ]);
-
-            $product->categories()->sync($request->categories);
 
             $product->detail()->update([
                 'long_description'=>$request->long_description,
@@ -109,7 +108,7 @@ class ProductService
 
         }catch (\Exception $exception){
 
-            return $exception->getMessage();
+            dd($exception->getMessage());
         }
 
         return  "Ürün Basaşarıyla Güncellendi !";
@@ -125,14 +124,19 @@ class ProductService
 
     public  function getProductVariants($product_id){
 
-        return Variant::where('product_id',$product_id)->with('media','product')->get();
+        return Variant::whereHas('product.shop',function ($shopQuery){
+           // $shopQuery->where('user_id',Auth::id());
+        })->where('product_id',$product_id)->with('media','product')->get();
 
 
     }
 
     public  function deleteProduct($product_id){
 
-        $product = Product::findOrFail($product_id);
+
+        $product = Product::whereHas('shop',function ($shopQuery){
+            $shopQuery->where('user_id',Auth::id());
+        })->findOrFail($product_id);
 
         $variant_ids = $product->variants()->pluck('id')->toArray();
 

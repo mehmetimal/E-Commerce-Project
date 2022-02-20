@@ -48,6 +48,9 @@ class Shop extends Model implements HasMedia
             ->height(232)
             ->sharpen(10);
     }
+    public static  $PERSONAL_SHOP=1;
+    public static  $PRIVATE_SHOP=2;
+    public static  $LIMITED_SHOP=3;
 
 
 }

@@ -26,30 +26,44 @@ class ShopService
 
     public function storeShopByType(Request $request)
     {
-
-
-
         $iyzicoService=new IyzicoService();
 
-        $shop = Shop::create([
-            'user_id' => $request->user_id,
-            'nick_name' => $request->nick_name,
-            'name' => $request->name,
-        ]);
+        if ($request->shop_type==Shop::$PERSONAL_SHOP){
+           return  $iyzicoService->createPersonalShop(
+                $request->user_id,$request->nick_name,
+                $request->name,$request->image,$request->address,
+                $request->Iban,$request->IdentityNumber,
+                $request->commission_rate);
+        }elseif ($request->shop_type == Shop::$PRIVATE_SHOP){
 
+            return $iyzicoService->createPrivateShop(
+                $request->user_id,
+                $request->nick_name,
+                $request->name,$request->image,$request->address,
+                $request->Iban,$request->IdentityNumber,
+                $request->commission_rate,
+                $request->taxOffice,
+                $request->legalCompanyName
 
-        $shop->addMedia($request->image)->toMediaCollection('shop_logos');
+            );
+        }elseif($request->shop_type == Shop::$LIMITED_SHOP){
 
-        if ($request->shop_type==1){
-            $subMerchant= $iyzicoService->createPersonalShop($request,$shop->id);
-        }elseif ($request->shop_type == 2){
-            $subMerchant = $iyzicoService->createPrivateShop($shop->id);
-        }elseif($request->shop_type == 3){
-            $subMerchant= $iyzicoService->createLimitedShop($shop->id);
+           return  $iyzicoService->createLimitedShop(
+                $request->user_id,
+                $request->nick_name,
+                $request->name,
+                $request->image,
+                $request->address,
+                $request->Iban,
+                $request->commission_rate,
+                $request->legalCompanyName,
+                $request->taxNumber,
+                $request->taxOffice
+            );
         }else{
             dd('invalid Shop_type');
         }
-        dd($subMerchant);
+
     }
 
     public function getShop($shop_id)

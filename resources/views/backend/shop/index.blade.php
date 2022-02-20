@@ -14,8 +14,8 @@
        @can('Create Shop')
         <div class="card-header">
             <h3 class="card-title"><a href="{{route('shop.create',['shop_type'=>1])}}" class="btn btn-outline-success">Şahış Şirketi Ekle  </a></h3>
-            <h3 class="card-title"><a href="{{route('shop.create',2)}}" class="btn btn-outline-success">Anonim Şahış Şirketi Ekle  </a></h3>
-            <h3 class="card-title"><a href="{{route('shop.create',3)}}" class="btn btn-outline-success">LTD/Şirketi Ekle</a></h3>
+            <h3 class="card-title"><a href="{{route('shop.create',['shop_type'=>2])}}" class="btn btn-outline-success">Anonim Şahış Şirketi Ekle  </a></h3>
+            <h3 class="card-title"><a href="{{route('shop.create',['shop_type'=>3])}}" class="btn btn-outline-success">LTD/Şirketi Ekle</a></h3>
 
         </div>
 

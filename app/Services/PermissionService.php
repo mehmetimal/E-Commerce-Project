@@ -14,9 +14,9 @@ class PermissionService
         return Permission::all();
     }
 
-    public  function storePermission(Request $request){
+    public  function storePermission($name){
         Permission::create([
-            'name'=>$request->name
+            'name'=>$name
         ]);
     }
 

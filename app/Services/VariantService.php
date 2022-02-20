@@ -113,6 +113,7 @@ class VariantService
 
 public  function getNotPublishedVariants(){
     if (Auth::user()->hasRole(['Super Admin','Admin'])){
+
         return Variant::where('is_published',0)->get();
     }else{
         return Variant::whereHas('product.shop',function ($shopQuery){

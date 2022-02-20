@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\attributeValue\AttributeValueStoreRequest;
 use App\Models\AttributeValue;
 use App\Services\AttributeService;
 use App\Services\AttributeValueService;
@@ -26,16 +27,15 @@ class AttributeValueController extends Controller
         return $this->attributeValueService;
     }
 
-    public function store(Request $request)
+    public function store(AttributeValueStoreRequest $request)
     {
-
         $this->getAttributeValueService()->storeAttributeValue($request->name,$request->values);
-
 
        return back()->with([
            'message'=>'Güncelleme Başarılı ! '
        ]);
     }
+
     public function destroy($attributeValueId)
     {
         $this->getAttributeValueService()->deleteValue($attributeValueId);

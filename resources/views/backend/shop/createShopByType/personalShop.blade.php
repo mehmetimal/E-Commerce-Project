@@ -113,7 +113,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-group ">
+                                <label>Komisyon Oranı  </label>
+                                <input  class="form-control"  name="commission_rate" type="number" placeholder="Komisyon Oranı  ">
+                            </div>
+                        </div>
 
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\permission\StorePermissionRequest;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
 
@@ -46,9 +47,9 @@ class PermissionController extends Controller
         return view('backend.user.permission.create');
     }
 
-    public function store(Request $request)
+    public function store(StorePermissionRequest $request)
     {
-        $this->getPermissionService()->storePermission($request);
+        $this->getPermissionService()->storePermission($request->name);
         return back()->with([
             'message'=>'İzin Basarıyla Eklendi'
         ]);

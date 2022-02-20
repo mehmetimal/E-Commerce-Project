@@ -1,5 +1,5 @@
 @extends('errors::minimal')
 
-@section('title', __('Forbidden'))
+@section('title', __('Yetki Yok'))
 @section('code', '403')
-@section('message', __($exception->getMessage() ?: 'Forbidden'))
+@section('message', __($exception->getMessage() ?: 'Bu sayfaya Yetkiniz Yok'))

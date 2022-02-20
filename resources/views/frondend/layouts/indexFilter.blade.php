@@ -14,12 +14,21 @@
                             <div class="col-12 col-md-3 widget">
                                 <h5 class="widget-title">Kategoriye Göre Filtrele  </h5>
                                 <div class="loke_scroll" id="category_filter_div">
-                                    <ul class="nt_filter_block nt_filter_styleck css_ntbar" data-filter_condition="and">
-                                        @foreach($categories as $category)
-                                            <li data-category-id="{{$category->id}}">
-                                                <a href="#" aria-label="Narrow selection to products matching tag size s">{{$category->name}}</a>
-                                            </li>
-                                        @endforeach
+                                    <ul class="nt_filter_block nt_filter_styleck css_ntbar" >
+                                       @if(isset($descants)   )
+
+                                            @foreach($descants as $category)
+                                                <li data-category-id="{{$category->id}}">
+                                                    <a href="#" aria-label="Narrow selection to products matching tag size s">{{$category->name}}</a>
+                                                </li>
+                                            @endforeach
+                                        @else
+                                            @foreach($categories as $category)
+                                                <li data-category-id="{{$category->id}}">
+                                                    <a href="#" aria-label="Narrow selection to products matching tag size s">{{$category->name}}</a>
+                                                </li>
+                                            @endforeach
+                                        @endisset
                                     </ul>
                                 </div>
                             </div>
@@ -77,7 +86,7 @@
         $('#filter_button').on('click',function (){
 
             $("#category_filter_div > ul >li.active").each(function(index,item) {
-                $('#filterForm').append('<input  name="category_ids[]" value="'+$(this).data('category-id')+'">')
+                $('#filterForm').append('<input  name="category_id" value="'+$(this).data('category-id')+'">')
 
             })
             $("#shop_filter_div > ul >li.active").each(function(index,item) {

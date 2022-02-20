@@ -78,11 +78,12 @@
                                     @foreach($categories as $singleCategory)
                                         <option
                                             @foreach($category->ancestors as $ancestor)
-                                            {{$singleCategory -> id  == $ancestor->id ? 'selected="selected"': ''}}
-                                            {{$category -> id == $singleCategory->id ? 'disabled="disabled"': ''}}
-                                            value="{{$singleCategory->id}}" >
+                                            {{$singleCategory -> id  == $ancestor->id ? 'selected': ''}}
+                                            {{$category -> id == $singleCategory->id ? 'disabled' : ''}}
                                             {{$singleCategory->name}}
                                             @endforeach
+                                            value="{{$singleCategory->id}}" >
+{{$singleCategory->name}}
                                         </option>
                                     @endforeach
 
@@ -129,12 +130,20 @@
 
                                 <select name="attribute_ids[]" class="form-control form-control-lg attributes p-5" multiple   style="width: 100%;">
                                     @foreach($attributes as $attribute)
-                                        @foreach($category->attributes as $categoryAttribute)
 
 
-                                        <option  {{$categoryAttribute->pivot->attribute_id == $attribute->id ? 'selected="selected"': ''}} value="{{$attribute->id}}"> {{$attribute->name}} </option>
-                                        @endforeach
-                                        @endforeach
+
+                                        <option value="{{$attribute->id}}"
+                                            @foreach($category->attributes as $categoryAttribute)
+                                                {{$categoryAttribute->pivot->attribute_id == $attribute->id ? 'selected="selected"': ''}}
+
+                                            @endforeach
+                                        > {{$attribute->name}}
+
+
+                                        </option>
+
+                                            @endforeach
                                 </select>
 
                                 @if($errors->has('attribute_ids'))
