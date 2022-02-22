@@ -11,7 +11,7 @@
 
          <div id="variantList">
         <!--product container-->
-            @include('frondend.layouts.variantList')
+        @include('frondend.layouts.variantList')
         <!--end product container-->
          </div>
     </div>

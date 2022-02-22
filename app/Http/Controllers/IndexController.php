@@ -91,11 +91,9 @@ class IndexController extends Controller
 
         $categoryAttributes = $this->getIndexService()->getAttributesByCategoryId($category_id);
 
-        $descendantsOfCategory =$this->getIndexService()->getCategoryDescendants($category_id);
+        $descendantsOfCategory =$this->getIndexService()->getOneDepthDescants($category_id);
 
-        if ($descendantsOfCategory->isEmpty()){
-            $descendantsOfCategory = $this->getIndexService()->getAncestors($category_id);
-        }
+
         return view('frondend.shop')->with([
             'descendantsOfCategory'=>$descendantsOfCategory,
             'attributes'=>$categoryAttributes,
@@ -229,6 +227,12 @@ class IndexController extends Controller
     }
     public  function getDescants(){
 
+    }
+    public function getOneDepthDescants(Request $request){
+
+        $categories = $this->getIndexService()->getOneDepthDescants($request->categoryId);
+        dd($categories);
+        return response()->json($categories);
     }
 
 }

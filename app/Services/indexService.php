@@ -94,7 +94,7 @@ public function getAttributesForVariants($variants){
         })->get();
     }
     public function getCategoryDescendants( $category_id){
-        return Category::descendantsOf($category_id);
+       return Category::descendantsOf($category_id);
     }
     public  function getCategory($category_id){
         return Category::findOrFail($category_id);
@@ -178,5 +178,9 @@ public function getAttributesForVariants($variants){
     }
     public  function getAncestors($category_id){
        return  Category::ancestorsOf($category_id);
+    }
+    public function  getOneDepthDescants($category_id){
+       $node = Category::findOrFail($category_id);
+        return  $node->children ;
     }
 }

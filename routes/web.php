@@ -150,6 +150,9 @@ Route::get('site-yorumları',[\App\Http\Controllers\IndexController::class,'getS
 
 Route::post('get-district-by-province-id',[\App\Http\Controllers\IndexController::class,'getDistrictByProvinceId'])->name('get.district.by.province.id');
 
+Route::post('get-catqaegory-descandeants',[\App\Http\Controllers\IndexController::class,'getOneDepthDescants'])->name('get.one.depth.category');
+
+
 Route::post('urun-filtrele',[\App\Http\Controllers\IndexController::class,'filterVariantByAttribute'])->name('filter.by.attribute');
 /*
  * Giriş Yapanlara ÖZEL ROUTELAR
